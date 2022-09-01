@@ -72,6 +72,7 @@
 					0x194 0x20 /* mcasp0_fsx, 			P9_29 | MODE0 | INPUT_PULLDOWN */
 					0x190 0x20 /* mcasp0_aclkx, 		P9_31 | MODE0 | INPUT_PULLDOWN */
 					0x198 0x20 /* mcasp0_axr0, 			P9_30 | MODE0 | INPUT_PULLDOWN */
+					0x0d4 0x24 /* mcasp0_axr3, 			P8_33 | MODE0 | INPUT_PULLDOWN */
 				>;
 			};
 
