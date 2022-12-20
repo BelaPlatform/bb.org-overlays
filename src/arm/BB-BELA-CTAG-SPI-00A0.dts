@@ -19,7 +19,6 @@
 	exclusive-use =
 		/* the pin header uses */
 		"P8.32",	/* spi_sclk */
-		"P8.33",	/* spi_mosi */
 		"P8.14",	/* spi_miso */
 		"P8.17",	/* spi_cs0 */
 		"P8.31",	/* spi_cs1 */
@@ -33,7 +32,7 @@
 				pinctrl-single,pins = <
 					0x0DC 0x37 /* spi_sclk, 	MODE7 | INPUT_PULLUP | SPI_SCLK P8_32 */
 					0x028 0x37 /* spi_miso, 	MODE7 | INPUT_PULLUP | SPI_MISO P8_14 */
-					0x0D4 0x17 /* spi_mosi, 	MODE7 | OUTPUT_PULLUP | SPI_MOSI P8_33 */
+					// has to be set at runtime using bone_pinmux_helper /* spi_mosi, MODE7 | OUTPUT_PULLUP | SPI_MOSI P8_33 */
 					0x02C 0x17 /* spi_cs0, 		MODE7 | OUTPUT_PULLUP | SPI_CS0 P8_17 */
 					0x0D8 0x17 /* spi_cs1,		MODE7 | OUTPUT_PULLUP | SPI_CS1 P8_31 */
 				>;

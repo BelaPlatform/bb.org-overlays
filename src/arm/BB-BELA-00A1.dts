@@ -72,7 +72,9 @@
 					0x194 0x20 /* mcasp0_fsx, 			P9_29 | MODE0 | INPUT_PULLDOWN */
 					0x190 0x20 /* mcasp0_aclkx, 		P9_31 | MODE0 | INPUT_PULLDOWN */
 					0x198 0x20 /* mcasp0_axr0, 			P9_30 | MODE0 | INPUT_PULLDOWN */
-					0x0d4 0x24 /* mcasp0_axr3, 			P8_33 | MODE0 | INPUT_PULLDOWN */
+					/* For AXR3 on P8.33 we add instead an
+					 * entry to bone-pinmux-helper below so that config-pin can handle it at
+					 * runtime and manage the conflict with CTAG pins */
 				>;
 			};
 
@@ -294,5 +296,42 @@
 			clock-frequency = <400000>;
 		};
 
+	};
+	fragment@11 {
+		target = <&am33xx_pinmux>;
+			__overlay__ {
+			/* P8_33 (ZCZ ball V3) hdmi */
+			P8_33_default_pin: pinmux_P8_33_default_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x08d4, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE7) >; };	/* lcd_data13.gpio0_9 */
+			P8_33_gpio_pin: pinmux_P8_33_gpio_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x08d4, PIN_OUTPUT | INPUT_EN | MUX_MODE7) >; };		/* lcd_data13.gpio0_9 */
+			P8_33_gpio_pu_pin: pinmux_P8_33_gpio_pu_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x08d4, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE7) >; };	/* lcd_data13.gpio0_9 */
+			P8_33_gpio_pd_pin: pinmux_P8_33_gpio_pd_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x08d4, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE7) >; };	/* lcd_data13.gpio0_9 */
+			P8_33_gpio_input_pin: pinmux_P8_33_gpio_input_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x08d4, PIN_INPUT | MUX_MODE7) >; };			/* lcd_data13.gpio0_9 */
+			P8_33_qep_pin: pinmux_P8_33_qep_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x08d4, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE2) >; };	/* lcd_data13.eqep1b_in */
+			P8_33_mcasp_pin: pinmux_P8_33_mcasp_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x08d4, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE4) >; };	/* lcd_data13.eqep1b_in */
+		};
+	};
+	fragment@12 {
+		target = <&ocp>;
+			__overlay__ {
+			P8_33_pinmux {
+				compatible = "bone-pinmux-helper";
+				status = "okay";
+				pinctrl-names = "default", "gpio", "gpio_pu", "gpio_pd", "gpio_input", "qep", "mcasp";
+				pinctrl-0 = <&P8_33_default_pin>;
+				pinctrl-1 = <&P8_33_gpio_pin>;
+				pinctrl-2 = <&P8_33_gpio_pu_pin>;
+				pinctrl-3 = <&P8_33_gpio_pd_pin>;
+				pinctrl-4 = <&P8_33_gpio_input_pin>;
+				pinctrl-5 = <&P8_33_qep_pin>;
+				pinctrl-6 = <&P8_33_mcasp_pin>;
+			};
+		};
 	};
 };
