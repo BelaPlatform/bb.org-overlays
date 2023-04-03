@@ -43,7 +43,7 @@
 			P9_28_pinmux { status = "disabled"; }; /* mcasp0_axr2 */
 			P9_29_pinmux { status = "disabled"; }; /* mcasp0_fsx */
 			P9_31_pinmux { status = "disabled"; }; /* mcasp0_ahclk */
-			P9_30_pinmux { status = "disabled"; }; /* mcasp0_axr0 */
+			// P9_30 handled separately below
 
 			P9_22_pinmux { status = "disabled"; }; /* spi0_sclk */
 			P9_21_pinmux { status = "disabled"; }; /* spi0_d0 */
@@ -71,10 +71,11 @@
 					0x19c 0x22 /* mcasp0_axr2, 			P9_28 | MODE2 | INPUT_PULLDOWN */
 					0x194 0x20 /* mcasp0_fsx, 			P9_29 | MODE0 | INPUT_PULLDOWN */
 					0x190 0x20 /* mcasp0_aclkx, 		P9_31 | MODE0 | INPUT_PULLDOWN */
-					0x198 0x20 /* mcasp0_axr0, 			P9_30 | MODE0 | INPUT_PULLDOWN */
 					/* For AXR3 on P8.33 we add instead an
 					 * entry to bone-pinmux-helper below so that config-pin can handle it at
 					 * runtime and manage the conflict with CTAG pins */
+					/* For AXR0 on P9.30 we do something similar so that it can be used
+					 * for SPI */
 				>;
 			};
 
@@ -331,6 +332,78 @@
 				pinctrl-4 = <&P8_33_gpio_input_pin>;
 				pinctrl-5 = <&P8_33_qep_pin>;
 				pinctrl-6 = <&P8_33_mcasp_pin>;
+			};
+		};
+	};
+	// the next three fragments allow P9.30 to be used for SPI.
+	// only works for single data line peripherals (e.g.: WS2812B)
+	fragment@13 {
+		target = <&am33xx_pinmux>;
+			__overlay__ {
+			/* P9_30 (ZCZ ball D12) gpio3_16 */
+			P9_30_gpio_pin: pinmux_P9_30_gpio_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_OUTPUT | INPUT_EN | MUX_MODE7) >; };		/* mcasp0_axr0.gpio3_16 */
+			P9_30_gpio_pu_pin: pinmux_P9_30_gpio_pu_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_axr0.gpio3_16 */
+			P9_30_gpio_pd_pin: pinmux_P9_30_gpio_pd_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE7) >; };	/* mcasp0_axr0.gpio3_16 */
+			P9_30_gpio_input_pin: pinmux_P9_30_gpio_input_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_INPUT | MUX_MODE7) >; };			/* mcasp0_axr0.gpio3_16 */
+			P9_30_pwm_pin: pinmux_P9_30_pwm_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE1) >; };	/* mcasp0_axr0.ehrpwm0_tripzone_input */
+			P9_30_spi_pin: pinmux_P9_30_spi_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE3) >; };	/* mcasp0_axr0.spi1_d1 */
+			P9_30_pruout_pin: pinmux_P9_30_pruout_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_OUTPUT_PULLDOWN | INPUT_EN | MUX_MODE5) >; };	/* mcasp0_axr0.pru0_out2 */
+			P9_30_pruin_pin: pinmux_P9_30_pruin_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_INPUT | MUX_MODE6) >; };			/* mcasp0_axr0.pru0_in2 */
+			P9_30_mcasp_pin: pinmux_P9_30_mcasp_pin { pinctrl-single,pins = <
+				AM33XX_IOPAD(0x0998, PIN_INPUT | MUX_MODE0) >; };			/* mcasp0_axr0.mcasp0_axr0 */
+		};
+	};
+	fragment@14 {
+		target = <&ocp>;
+		__overlay__ {
+			P9_30_pinmux {
+				compatible = "bone-pinmux-helper";
+				status = "okay";
+				pinctrl-names = "default", "gpio", "gpio_pu", "gpio_pd", "gpio_input", "spi", "pwm", "pruout", "pruin", "mcasp";
+				pinctrl-0 = <&P9_30_mcasp_pin>; // set mcasp as default so no changes to the core code are needed
+				pinctrl-1 = <&P9_30_gpio_pin>;
+				pinctrl-2 = <&P9_30_gpio_pu_pin>;
+				pinctrl-3 = <&P9_30_gpio_pd_pin>;
+				pinctrl-4 = <&P9_30_gpio_input_pin>;
+				pinctrl-5 = <&P9_30_spi_pin>;
+				pinctrl-6 = <&P9_30_pwm_pin>;
+				pinctrl-7 = <&P9_30_pruout_pin>;
+				pinctrl-8 = <&P9_30_pruin_pin>;
+				pinctrl-9 = <&P9_30_mcasp_pin>;
+			};
+		};
+	};
+	fragment@15 {
+		target = <&spi1>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "okay";
+
+			channel@0 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				compatible = "spidev";
+				symlink = "spi/1.0";
+				reg = <0>;
+				spi-max-frequency = <24000000>;
+			};
+
+			channel@1 {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				compatible = "spidev";
+				symlink = "spi/1.1";
+				reg = <1>;
+				spi-max-frequency = <24000000>;
 			};
 		};
 	};
