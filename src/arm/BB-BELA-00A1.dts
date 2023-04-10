@@ -19,8 +19,6 @@
 	fragment@0 {
 		target = <&ocp>;
 		__overlay__ {
-			P2_09_pinmux { status = "disabled"; }; 
-			P2_11_pinmux { status = "disabled"; }; 
 			P2_26_pinmux { status = "disabled"; };
 			P2_30_pinmux { status = "disabled"; };
 			P2_32_pinmux { status = "disabled"; };
@@ -123,14 +121,18 @@
 			P1_30_bela: pinmux_default_bela15 { pinctrl-single,pins = <0x174 0x27>; };
 			P1_02_bela: pinmux_default_led0 { pinctrl-single,pins = <0xe4 0x27>; };
 			P1_04_bela: pinmux_default_led1 { pinctrl-single,pins = <0xec 0x27>; };
+			P2_09_bela: pinmux_default_bela_i2c1_scl { pinctrl-single,pins = <0x184 0x33>; };
+			P2_11_bela: pinmux_default_bela_i2c1_sda { pinctrl-single,pins = <0x180 0x33>; };
 
 			/* Pinmux for i2c on Bela header */
+#if 0
 			i2c1_pins: pinmux_i2c1_pins {
 				pinctrl-single,pins = <
 					0x180 0x33 /* i2c1_sda, 	P9_26 | MODE3 | INPUT_PULLUP */
 					0x184 0x33 /* i2c1_scl,		P9_24 | MODE3 | INPUT_PULLUP */
 				>;
 			};
+#endif
 
 			// Pinmux for i2c2 for Bela codec
 			i2c2_pins: pinmux_i2c2_pins {
@@ -169,7 +171,7 @@
 		target = <&i2c1>;
 		__overlay__ {
 			pinctrl-names = "default";
-			pinctrl-0 = <&i2c1_pins>;
+			//pinctrl-0 = <&i2c1_pins>;
 
 			status = "okay";
 			clock-frequency = <400000>;
@@ -258,7 +260,9 @@
 			P2_04_pinmux{ pinctrl-0 = <&P2_04_bela>; };
 			P2_06_pinmux{ pinctrl-0 = <&P2_06_bela>; };
 			P2_08_pinmux{ pinctrl-0 = <&P2_08_bela>; };
+			P2_09_pinmux{ pinctrl-0 = <&P2_09_bela>; };
 			P2_10_pinmux{ pinctrl-0 = <&P2_10_bela>; };
+			P2_11_pinmux{ pinctrl-0 = <&P2_11_bela>; };
 			P2_18_pinmux{ pinctrl-0 = <&P2_18_bela>; };
 			P2_20_pinmux{ pinctrl-0 = <&P2_20_bela>; };
 			P2_22_pinmux{ pinctrl-0 = <&P2_22_bela>; };
